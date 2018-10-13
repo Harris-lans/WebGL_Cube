@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PicoGL.js</title>
+    <link rel="stylesheet" href="site/css/docco.css"> 
+    <link rel="stylesheet" href="site/css/picogl.css"> 
+    <script src="site/js/highlight.min.js"></script>
+</head>
+<body>
+    <a href="https://github.com/tsherif/picogl.js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
+    <h1>PicoGL.js</h1>
+    <div class="description">
+        <a class="badge-link" href="https://travis-ci.org/tsherif/picogl.js">
+            <img src="https://travis-ci.org/tsherif/picogl.js.svg?branch=master">
+        </a>
+        <a class="badge-link" href="https://github.com/tsherif/picogl.js/blob/master/build/picogl.min.js">
+            <img src="https://badge-size.herokuapp.com/tsherif/picogl.js/master/build/picogl.min.js.svg?compression=gzip">
+        </a>
+        <a class="badge-link" href="https://gitter.im/picogl-js/general">
+            <img src="https://img.shields.io/gitter/room/picogl.js/general.svg">
+        </a>
+        <a class="badge-link" href="https://github.com/tsherif/picogl.js/blob/master/LICENSE">
+            <img src="https://img.shields.io/github/license/tsherif/picogl.js.svg">
+        </a>
+        <a class="badge-link" href="https://www.npmjs.com/package/picogl">
+            <img src="https://img.shields.io/npm/v/picogl.svg">
+        </a>
+    </div>
+    <div class="description">
+        <a class="resources-link" href="./docs/">
+            API Docs
+        </a> | 
+        <a class="resources-link" href="https://tsherif.wordpress.com/2017/07/26/webgl-2-development-with-picogl-js/">
+            Tutorial
+        </a> | 
+        <a class="resources-link" href="https://gitter.im/picogl-js/general">
+            Chat
+        </a>
+    </div>
+    <div class="description">
+        PicoGL.js is minimal WebGL 2 rendering library. It's meant for developers who understand the WebGL 2 rendering pipeline and want to use it, but with a more convenient API. Typical usage of PicoGL.js will involve creating programs, vertex buffers, vertex arrays, uniform buffers, framebuffers, textures, transform feedbacks, and combining them into draw calls.
+    </div>
+    <pre><code class="javascript">
+    // Create a PicoGL.js app to manage GL state.
+    var app = PicoGL.createApp(canvas)
+    .clearColor(0.0, 0.0, 0.0, 1.0);
+
+    // Create program from shader source.
+    var program = app.createProgram(vertexShaderSource, fragmentShaderSource);
+
+    // Scene geometry stored vertex buffer object.
+    var positions = app.createVertexBuffer(PicoGL.FLOAT, 2, new Float32Array([
+        -0.5, -0.5,
+         0.5, -0.5,
+         0.0,  0.5
+    ]));
+
+    // Vertex buffer and attribute pointer state stored
+    // in vertex array object.
+    var vertexArray = app.createVertexArray()
+    .vertexAttributeBuffer(0, positions);
+
+    // Scene data stored in uniform buffer object. 
+    var uniformBuffer = app.createUniformBuffer([
+        PicoGL.FLOAT_VEC4,
+        PicoGL.FLOAT_VEC4
+    ])
+    .set(0, new Float32Array([1.0, 0.0, 0.0, 0.3]))
+    .set(1, new Float32Array([0.0, 0.0, 1.0, 0.7]))
+    .update();
+
+    // Create a draw call from program, vertex array, uniform buffer.
+    var drawCall = app.createDrawCall(program, vertexArray)
+    .uniformBlock("ColorUniforms", uniformBuffer);
+
+    // Draw!
+    app.clear()
+    drawCall.draw();
+    </code></pre>
+    
+    <div class="description">
+        PicoGL.js can be used directly by downloading the <a href="https://tsherif.github.io/picogl.js/build/picogl.min.js">built source</a> and loading it via a script tag:    
+    </div>
+
+    <pre><code class="html">
+    &lt;script src&equals;&quot;js/picogl.min.js&quot;&gt;&lt;/script&gt;
+    </code></pre>
+
+    <div class="description">
+        or it can be installed via <a href="https://www.npmjs.com/package/picogl">npm</a>:   
+    </div>
+
+    <pre><code class="bash">
+    npm install picogl
+    </code></pre>
+
+    <div class="description">
+        and loaded via CommonJS-style <code>require</code>:   
+    </div>
+
+    <pre><code class="javascript">
+    var PicoGL = require("picogl");
+    </code></pre>
+
+    <div class="description">
+        Note that PicoGL.js is <strong>not</strong> a scene graph library. There are no objects, hierarchies, transforms, materials, etc. It has been designed only to make management of GPU state more convenient. Its conceptual model maps fairly directly to the constructs one deals with when writing directly with the WebGL 2 API. The only higher-level construct is the draw call, which manages sets of related lower-level constructs.    
+    </div>
+
+    <h2>Basic Examples</h2>
+    <a href="#" class="example-menu-button" id="triangle">Triangle</a>
+    <a href="#" class="example-menu-button" id="ubo">Uniform Buffers</a>
+    <a href="#" class="example-menu-button" id="instanced">Instanced Drawing</a>
+    <a href="#" class="example-menu-button" id="transformfeedback">Transform Feedback</a>
+    <a href="#" class="example-menu-button" id="cube">Phong-shaded Cube</a>
+    <a href="#" class="example-menu-button" id="cubemap">Cubemap</a>
+    <a href="#" class="example-menu-button" id="texturearray">Texture Arrays</a>
+    <a href="#" class="example-menu-button" id="3Dtexture">3D Textures</a>
+    <a href="#" class="example-menu-button" id="rtt">Render to Texture</a>
+    <a href="#" class="example-menu-button" id="render-to-cubemap">Render to Cubemap</a>
+    <a href="#" class="example-menu-button" id="render-to-3Dtexture">Render to 3D texture</a>
+    <a href="#" class="example-menu-button" id="compressed-textures">Compressed Textures</a>
+
+    <h2>Advanced Examples</h2>
+    <a href="#" class="example-menu-button" id="picking">Picking</a>
+    <a href="#" class="example-menu-button" id="shadow">Shadow Mapping</a>
+    <a href="#" class="example-menu-button" id="dof">Depth of Field</a>
+    <a href="#" class="example-menu-button" id="ssao">Screen Space Ambient Occlusion</a>
+    <a href="#" class="example-menu-button" id="deferred">Deferred Rendering</a>
+    <a href="#" class="example-menu-button" id="oit">Order-independent Transparency</a>
+    <a href="#" class="example-menu-button" id="particles">Particles</a>
+    <a href="#" class="example-menu-button" id="bloom">Bloom</a>
+    <a href="#" class="example-menu-button" id="wandering-triangles">Wandering Triangles</a>
+    <a href="#" class="example-menu-button" id="cloth">Cloth</a>
+    <a href="#" class="example-menu-button" id="outline">Outline</a>
+    <a href="#" class="example-menu-button" id="occlusion">Occlusion Culling</a>
+    <a href="#" class="example-menu-button" id="motion-blur">Motion Blur</a>
+    <a href="#" class="example-menu-button" id="mesh-compression">Mesh Compression</a>
+    <a href="#" class="example-menu-button" id="omni-shadows">Omni-directional Shadows</a>
+
+    <h2>Benchmarks</h2>
+    <a href="#" class="example-menu-button" id="64kcubes">64,000 Cubes</a>
+    <a href="#" class="example-menu-button" id="125kcubes">125,000 Cubes</a>
+
+    <div id="example-div">
+        <div id="example-title"></div>
+        <iframe id="examples"></iframe>
+    </div>
+
+    <script>
+        var exampleFrame = document.getElementById("examples");
+        var exampleTitle = document.getElementById("example-title");
+
+        document.body.addEventListener("click", function(event) {
+            if (event.target.className !== "example-menu-button") {
+                return;
+            }
+
+            var link = event.target;
+            var title = link.text;
+            if (title === "Wandering Triangles") {
+                title += "<BR>(Transform Feedback and Instanced Drawing)";
+            }
+            if (title === "Cloth") {
+                title += "<BR>(Use mouse to control ball)";
+            }
+            if (title === "Mesh Compression") {
+                title += "<BR>Sphere on the left is uncompressed, sphere on the right is quantized <BR>and oct-encoded.";
+            }
+            var src = "examples/" + event.target.id + ".html";
+            var sourceCodeURL = "https://github.com/tsherif/picogl.js/blob/master/" + src;
+
+            exampleTitle.innerHTML = title + "<div><a href=\"" + sourceCodeURL + "\">Source code</a>";
+            examples.src = src;
+
+            event.stopPropagation();
+            event.preventDefault();
+        });
+
+        var canvas = document.createElement("canvas");
+        var gl = canvas.getContext("webgl2");
+
+        if (gl) {
+            var showcase = [
+                "3Dtexture",
+                "shadow",
+                "dof",
+                "particles",
+                "64kcubes",
+                "125kcubes",
+                "wandering-triangles",
+                "outline",
+                "occlusion",
+                "render-to-3Dtexture",
+                "omni-shadows"
+            ];
+
+            if (gl.getExtension("EXT_color_buffer_float")) {
+                showcase.push(
+                    "ssao",
+                    "deferred",
+                    "oit",
+                    "bloom",
+                    "cloth",
+                    "motion-blur"
+                );
+            }
+
+            var showcaseId = showcase[Math.floor(Math.random() * showcase.length)];
+            document.getElementById(showcaseId).click();
+
+            function testAll() {
+                var buttons = document.getElementsByClassName("example-menu-button");
+                var index = 0;
+                setInterval(function() {
+                    buttons[index].click();
+                    index = (index + 1) % buttons.length;
+                }, 2000);
+            }
+
+        } else {
+            document.getElementById("example-div").innerHTML = "Sorry your browser does not support WebGL 2.";
+        }
+
+        hljs.initHighlightingOnLoad();        
+    </script>
+    
+</body>
+</html>

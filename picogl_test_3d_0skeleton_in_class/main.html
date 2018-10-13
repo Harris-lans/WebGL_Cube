@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<!-- Let's include our libraries -->
+<script src="../picogl_js/build/picogl.min.js"></script>
+<!-- For 3d stuff we'll also use glmatrix, which is very convenient -->
+<script src="../gl-matrix-master/dist/gl-matrix-min.js"></script>
+<!-- utils.js is also... useful 
+<script src="../picogl_js/examples/utils/utils.js"></script>
+-->
+
+<!-- A bare-bones HTML page -->
+<html>
+  <head>
+    <title>Basic picojl.js App</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <!-- This canvas is where we will draw using webgl, we'll find it by ID -->
+    <canvas id="webgl-canvas"></canvas>
+</body>
+</html>
+
+<!-- A few, bare-bones shaders, we will fetch the source by ID -->
+<script type="shader/vs" id="test_vs">
+  #version 300 es
+
+  in vec3 position;
+  in vec3 normal;
+  out vec3 vNormal; // This is what we want to pass to the pixel shader
+
+  uniform ShaderGlobals
+  {
+    mat4 model_matrix;
+    mat4 view_matrix;
+    mat4 projection_matrix;
+  };
+
+  void main() 
+  {
+      // Calculating positions
+
+      vec3 objectSpacePosition = position;
+      vec3 worldSpacePosition = (model_matrix * vec4(objectSpacePosition, 1)).xyz;
+      vec3 viewSpacePosition = (view_matrix * vec4(worldSpacePosition, 1)).xyz;
+      vec4 screenSpacePosition = (projection_matrix * vec4(viewSpacePosition, 1));
+
+      gl_Position = screenSpacePosition;
+
+      // Calculating Normals
+      // Not translating the normals because they don't need to be translated. Only rotated
+
+      vec3 objectSpaceNormal = normal;
+      vec3 worldSpaceNormal = (model_matrix * vec4(objectSpaceNormal, 0)).xyz;
+      vec3 viewSpaceNormal = (view_matrix * vec4(worldSpaceNormal, 0)).xyz;
+
+      vNormal = viewSpaceNormal;
+  }
+</script>
+
+<script type="shader/fs" id="test_fs">
+  #version 300 es
+  precision highp float;
+
+  out vec4 fragColor;
+  in vec3 vNormal; // This is from the vertex shader
+
+  void main() {
+      fragColor = vec4(vNormal, 1.0);
+  }
+</script>
+
+<!-- Here is where all the actual application code is -->
+<script src="main.js"></script>
